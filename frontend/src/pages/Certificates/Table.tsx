@@ -55,7 +55,7 @@ export default function Table({ data, isFetching, onDelete, onRenew, onDownload,
 					);
 				},
 			}),
-			columnHelper.accessor((row: any) => row.provider, {
+			columnHelper.accessor((row: any) => row.meta?.dnsProvider ? `${row.provider} - ${row.meta.dnsProvider}` : row.provider, {
 				id: "provider",
 				header: intl.formatMessage({ id: "column.provider" }),
 				cell: (info: any) => {
