@@ -116,7 +116,7 @@ const internal2fa = {
 			throw new errs.ValidationError("No pending 2FA setup found");
 		}
 
-		codeTrim = code.trim();
+		let codeTrim = code.trim();
 
 		const result = await verify({ token: codeTrim, secret });
 		if (!result.valid) {
@@ -162,7 +162,7 @@ const internal2fa = {
 			throw new errs.ValidationError("2FA is not enabled");
 		}
 
-		codeTrim = code.trim();
+		let codeTrim = code.trim();
 
 		// Try TOTP code first, if it's 6 chars. it will throw errors if it's not 6 chars
 		// and the backup codes are 8 chars.
@@ -239,7 +239,7 @@ const internal2fa = {
 			return false;
 		}
 
-		tokenTrim = token.trim();
+		let tokenTrim = token.trim();
 
 		// Try TOTP code first, if it's 6 chars. it will throw errors if it's not 6 chars
 		// and the backup codes are 8 chars.
@@ -305,7 +305,7 @@ const internal2fa = {
 			throw new errs.ValidationError("No 2FA secret found");
 		}
 
-		tokenTrim = token.trim();
+		let tokenTrim = token.trim();
 
 		// Try TOTP code first, if it's 6 chars. it will throw errors if it's not 6 chars
 		// and the backup codes are 8 chars.
