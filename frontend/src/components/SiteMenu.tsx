@@ -148,7 +148,6 @@ const getMenuDropown = (item: MenuItem, onClick?: () => void) => {
 					type="button"
 					className="nav-link dropdown-toggle"
 					data-bs-toggle="dropdown"
-					data-bs-auto-close="outside"
 					aria-expanded="false"
 				>
 					<span className="nav-link-icon d-md-none d-lg-inline-block">
@@ -159,20 +158,18 @@ const getMenuDropown = (item: MenuItem, onClick?: () => void) => {
 					</span>
 				</button>
 				<div className="dropdown-menu">
-					{item.items?.map((subitem, idx) => {
-						return (
-							<HasPermission
-								key={`${idx}-${subitem.to}`}
-								section={subitem.permissionSection}
-								permission={subitem.permission || VIEW}
-								hideError
-							>
-								<NavLink to={subitem.to} isDropdownItem onClick={onClick}>
-									<T id={subitem.label} />
-								</NavLink>
-							</HasPermission>
-						);
-					})}
+					{item.items?.map((subitem, idx) => (
+						<HasPermission
+							key={`${idx}-${subitem.to}`}
+							section={subitem.permissionSection}
+							permission={subitem.permission || VIEW}
+							hideError
+						>
+							<NavLink to={subitem.to} isDropdownItem onClick={onClick}>
+								<T id={subitem.label} />
+							</NavLink>
+						</HasPermission>
+					))}
 				</div>
 			</li>
 		</HasPermission>
@@ -211,9 +208,7 @@ export function SiteMenu() {
 													},
 												] as MenuItem[])
 											: []),
-									].map((item) => {
-										return getMenuItem(item, closeMenu);
-									})}
+									].map((item) => getMenuItem(item, closeMenu))}
 								</ul>
 							</div>
 						</div>

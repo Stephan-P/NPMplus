@@ -45,7 +45,7 @@ export function AccessClientFields({ initialValues, name = "clients" }: Props) {
 
 	const setFormField = (newValues: AccessListClient[]) => {
 		const filtered = newValues.filter((v: AccessListClient) => v?.address?.trim() !== "");
-		setFieldValue(name, filtered);
+		void setFieldValue(name, filtered);
 	};
 
 	return (
@@ -92,10 +92,7 @@ export function AccessClientFields({ initialValues, name = "clients" }: Props) {
 						<button
 							type="button"
 							className="btn btn-ghost btn-danger p-0"
-							onClick={(e) => {
-								e.preventDefault();
-								handleRemove(idx);
-							}}
+							onClick={() => handleRemove(idx)}
 						>
 							<IconX size={16} />
 						</button>
