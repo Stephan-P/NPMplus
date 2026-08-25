@@ -133,7 +133,7 @@ const generateKeys = () => {
 
 	// Write keys config
 	try {
-		writeFileSync(keysFile, JSON.stringify({ key: privateKey, pub: publicKey }, null, 2));
+		writeFileSync(keysFile, JSON.stringify({ key: privateKey, pub: publicKey }, null, 2), { mode: 0o600 });
 	} catch (err) {
 		logger.error(`Could not write JWT key pair to config file: ${keysFile}: ${err.message}`);
 		process.exit(1);
