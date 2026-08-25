@@ -341,8 +341,12 @@ router
 			const result = await internalCertificate.download(res.locals.access, {
 				id: Number.parseInt(req.params.certificate_id, 10),
 			});
-			res.status(200).download(result.fileName, (err) => {
-				rm(path.dirname(result.fileName), { recursive: true, force: true });
+			res.status(200).download(result.fileName, async (err) => {
+				try {
+					await rm(path.dirname(result.fileName), { recursive: true, force: true });
+				} catch (rmErr) {
+					debug(logger, `${req.method.toUpperCase()} ${req.originalUrl}: ${rmErr}`);
+				}
 				if (err && !res.headersSent) next(err);
 			});
 		} catch (err) {
