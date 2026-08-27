@@ -29,13 +29,13 @@ const RenewCertificateModal = EasyModal.create(({ id, visible, remove }: Props) 
 		setIsFresh(false);
 		setIsSubmitting(true);
 
-		renewCertificate(id)
-			.then(() => {
+		void (async () => {
+			try {
+				await renewCertificate(id);
 				showObjectSuccess("certificate", "renewed");
-				queryClient.invalidateQueries({ queryKey: ["certificates"] });
+				await queryClient.invalidateQueries({ queryKey: ["certificates"] });
 				remove();
-			})
-			.catch((err: any) => {
+			} catch (err: any) {
 				if (err.payload?.debug?.stack) {
 					setErrorMsg(
 						<div className="w-100">
@@ -48,10 +48,10 @@ const RenewCertificateModal = EasyModal.create(({ id, visible, remove }: Props) 
 				} else {
 					setErrorMsg(<T id={err.message} />);
 				}
-			})
-			.finally(() => {
+			} finally {
 				setIsSubmitting(false);
-			});
+			}
+		})();
 	}, [id, data, isFresh, isSubmitting, remove, queryClient]);
 
 	return (

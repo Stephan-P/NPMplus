@@ -18,15 +18,15 @@ const HelpModal = EasyModal.create(({ section, visible, remove }: Props) => {
 	const lang = getLocale(true);
 
 	useEffect(() => {
-		try {
-			const docFile = getHelpFile(lang, section) as any;
-			fetch(docFile)
-				.then((response) => response.text())
-				.then(setMarkdownText)
-				.catch((ex: any) => setMarkdownText(`**ERROR:** ${ex.message}`));
-		} catch (ex: any) {
-			setMarkdownText(`**ERROR:** ${ex.message}`);
-		}
+		void (async () => {
+			try {
+				const docFile = getHelpFile(lang, section) as any;
+				const response = await fetch(docFile);
+				setMarkdownText(await response.text());
+			} catch (ex: any) {
+				setMarkdownText(`**ERROR:** ${ex.message}`);
+			}
+		})();
 	}, [lang, section]);
 
 	return (
