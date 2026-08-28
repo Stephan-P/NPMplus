@@ -44,9 +44,6 @@
 	"action.allow": {
 		"defaultMessage": "Toestaan"
 	},
-	"action.clone": {
-		"defaultMessage": "Klonen"
-	},
 	"action.close": {
 		"defaultMessage": "Sluiten"
 	},

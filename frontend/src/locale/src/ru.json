@@ -44,9 +44,6 @@
 	"action.allow": {
 		"defaultMessage": "Разрешить"
 	},
-	"action.clone": {
-		"defaultMessage": "Клонировать"
-	},
 	"action.close": {
 		"defaultMessage": "Закрыть"
 	},

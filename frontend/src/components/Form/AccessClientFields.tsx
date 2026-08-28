@@ -106,7 +106,7 @@ export function AccessClientFields({ initialValues, name = "clients" }: Props) {
 			</div>
 			<div className="row mb-3">
 				<p className="text-muted">
-					<T id="access-list.help-rules-last" />
+					<T id="access-list.help.rules-last" />
 				</p>
 				<div className="col-11">
 					<div className="input-group mb-2">

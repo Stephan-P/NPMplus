@@ -2,7 +2,7 @@
 
 ### HTTP-sertifikaat
 
-HTTP-valideeritud sertifikaat tähendab, et Certbot serverid
+HTTP-valideeritud sertifikaat tähendab, et Certboti serverid
 
 proovivad teie domeenidega ühendust luua HTTP (mitte HTTPS!) kaudu ja kui see õnnestub,
 väljastavad nad teile sertifikaadi.

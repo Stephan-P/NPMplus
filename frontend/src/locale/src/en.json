@@ -21,6 +21,9 @@
 		"defaultMessage": "Use the same as the Global Access List"
 	},
 	"access-list.help-rules-last": {
+		"defaultMessage": "When at least 1 rule exists, this deny all rule will be added last"
+	},
+	"access-list.help.rules-last": {
 		"defaultMessage": "This final rule will only be added if there is at least one other rule"
 	},
 	"access-list.help.rules-order": {
@@ -330,10 +333,10 @@
 		"defaultMessage": "Force HTTPS"
 	},
 	"domains.hsts-enabled": {
-		"defaultMessage": "HSTS Enabled (2 Years)"
+		"defaultMessage": "HSTS Enabled"
 	},
 	"domains.hsts-subdomains": {
-		"defaultMessage": "HSTS Subdomains+Preload"
+		"defaultMessage": "HSTS Sub-domains"
 	},
 	"domains.http2-support": {
 		"defaultMessage": "HTTP/2 Support"
@@ -440,6 +443,12 @@
 	"host.flags.fancyindex": {
 		"defaultMessage": "Enable fancyindex"
 	},
+	"host.flags.hsts-enabled": {
+		"defaultMessage": "HSTS Enabled (2 Years)"
+	},
+	"host.flags.hsts-subdomains": {
+		"defaultMessage": "HSTS Subdomains+Preload"
+	},
 	"host.flags.preserve-path": {
 		"defaultMessage": "Preserve Path"
 	},
@@ -484,21 +493,6 @@
 	},
 	"location.filter": {
 		"defaultMessage": "Filter by path or destination"
-	},
-	"login.2fa-code": {
-		"defaultMessage": "Verification Code"
-	},
-	"login.2fa-code-placeholder": {
-		"defaultMessage": "Enter code"
-	},
-	"login.2fa-description": {
-		"defaultMessage": "Enter the code from your authenticator app"
-	},
-	"login.2fa-title": {
-		"defaultMessage": "Two-Factor Authentication"
-	},
-	"login.2fa-verify": {
-		"defaultMessage": "Verify"
 	},
 	"login.title": {
 		"defaultMessage": "Login to your account"

@@ -17,7 +17,7 @@ Dieser Prozess unterstützt keine Wildcard-Domains.
 ### DNS-Zertifikat
 
 Für ein DNS-validiertes Zertifikat müssen Sie ein DNS-Provider-Plugin verwenden. Dieser DNS-
-Provider wird verwendet, um temporäre Einträge auf Ihrer Domain zu erstellen. Anschließend Certbot 
+Provider wird verwendet, um temporäre Einträge auf Ihrer Domain zu erstellen. Anschließend fragt Certbot
 diese Einträge ab, um sicherzustellen, dass Sie der Eigentümer sind. Bei Erfolg wird
 Ihr Zertifikat ausgestellt.
 

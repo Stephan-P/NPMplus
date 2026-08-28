@@ -1,61 +1,4 @@
 {
-	"2fa.backup-codes-remaining": {
-		"defaultMessage": "Verbleibende Backup-Codes: {count}"
-	},
-	"2fa.backup-warning": {
-		"defaultMessage": "Bewahre diese Backup-Codes an einem sicheren Ort auf. Jeder Code kann nur einmal verwendet werden."
-	},
-	"2fa.disable": {
-		"defaultMessage": "Zwei-Faktor-Authentifizierung deaktivieren"
-	},
-	"2fa.disable-confirm": {
-		"defaultMessage": "2FA deaktivieren"
-	},
-	"2fa.disable-warning": {
-		"defaultMessage": "Das Deaktivieren der Zwei-Faktor-Authentifizierung macht dein Konto weniger sicher."
-	},
-	"2fa.disabled": {
-		"defaultMessage": "Deaktiviert"
-	},
-	"2fa.done": {
-		"defaultMessage": "Ich habe meine Backup-Codes gespeichert"
-	},
-	"2fa.enable": {
-		"defaultMessage": "Zwei-Faktor-Authentifizierung aktivieren"
-	},
-	"2fa.enabled": {
-		"defaultMessage": "Aktiviert"
-	},
-	"2fa.enter-code": {
-		"defaultMessage": "Verifizierungscode eingeben"
-	},
-	"2fa.enter-code-disable": {
-		"defaultMessage": "Verifizierungscode zum Deaktivieren eingeben"
-	},
-	"2fa.regenerate": {
-		"defaultMessage": "Neu generieren"
-	},
-	"2fa.regenerate-backup": {
-		"defaultMessage": "Backup-Codes neu generieren"
-	},
-	"2fa.regenerate-instructions": {
-		"defaultMessage": "Gib einen Verifizierungscode ein, um neue Backup-Codes zu generieren. Deine alten Codes werden dadurch ungültig."
-	},
-	"2fa.secret-key": {
-		"defaultMessage": "Geheimer Schlüssel"
-	},
-	"2fa.setup-instructions": {
-		"defaultMessage": "Scanne diesen QR-Code mit deiner Authenticator-App oder gib den geheimen Schlüssel manuell ein."
-	},
-	"2fa.status": {
-		"defaultMessage": "Status"
-	},
-	"2fa.title": {
-		"defaultMessage": "Zwei-Faktor-Authentifizierung"
-	},
-	"2fa.verify-enable": {
-		"defaultMessage": "Verifizieren und aktivieren"
-	},
 	"access-list": {
 		"defaultMessage": "Zugriffsliste"
 	},
@@ -66,7 +9,7 @@
 		"defaultMessage": "{count} {count, plural, one {User} other {Users}}"
 	},
 	"access-list.help-rules-last": {
-		"defaultMessage": "Diese letzte Regel wird nur hinzugefügt, wenn mindestens eine andere Regel existiert."
+		"defaultMessage": "Wenn mindestens eine Regel vorhanden ist, wird diese Regel zum Ablehnen aller Anfragen als letzte hinzugefügt."
 	},
 	"access-list.help.rules-order": {
 		"defaultMessage": "Beachten Sie, dass die Anweisungen „Erlauben“ und „Verbieten“ in der Reihenfolge ihrer Definition angewendet werden."
@@ -100,9 +43,6 @@
 	},
 	"action.allow": {
 		"defaultMessage": "Erlauben"
-	},
-	"action.clone": {
-		"defaultMessage": "Klonen"
 	},
 	"action.close": {
 		"defaultMessage": "Schließen"
@@ -357,19 +297,13 @@
 		"defaultMessage": "Erzwinge HTTPS"
 	},
 	"domains.hsts-enabled": {
-		"defaultMessage": "HSTS aktiviert (2 Jahre)"
+		"defaultMessage": "HSTS aktiviert"
 	},
 	"domains.hsts-subdomains": {
-		"defaultMessage": "HSTS Subdomains+Preload"
+		"defaultMessage": "HSTS Sub-domains"
 	},
 	"domains.http2-support": {
 		"defaultMessage": "HTTP/2 Support"
-	},
-	"domains.http3-support": {
-		"defaultMessage": "HTTP/3 Support"
-	},
-	"domains.reuse-key": {
-		"defaultMessage": "Schlüssel beibehalten"
 	},
 	"domains.trust-forwarded-proto": {
 		"defaultMessage": "Upstream Forwarded-Proto-Header vertrauen"
@@ -378,7 +312,7 @@
 		"defaultMessage": "Nutze DNS Challenge"
 	},
 	"email-address": {
-		"defaultMessage": "E-Mail-Addresse"
+		"defaultMessage": "E-Mail-Adresse"
 	},
 	"empty-search": {
 		"defaultMessage": "Keine Ergebnisse gefunden"
@@ -428,14 +362,8 @@
 	"expires.on": {
 		"defaultMessage": "Ablauf am: {date}"
 	},
-	"footer.github": {
-		"defaultMessage": "Repo auf Github"
-	},
 	"footer.github-fork": {
 		"defaultMessage": "Fork me on Github"
-	},
-	"help": {
-		"defaultMessage": "Hilfe"
 	},
 	"host.flags.block-exploits": {
 		"defaultMessage": "Gängige Exploits blockieren"
@@ -476,23 +404,41 @@
 	"loading": {
 		"defaultMessage": "Laden…"
 	},
-	"login.2fa-code": {
-		"defaultMessage": "Verifizierungscode"
-	},
-	"login.2fa-code-placeholder": {
-		"defaultMessage": "Code eingeben"
-	},
-	"login.2fa-description": {
-		"defaultMessage": "Gib den Code aus deiner Authenticator-App ein"
-	},
-	"login.2fa-title": {
-		"defaultMessage": "Zwei-Faktor-Authentifizierung"
-	},
-	"login.2fa-verify": {
-		"defaultMessage": "Verifizieren"
-	},
 	"login.title": {
 		"defaultMessage": "Anmelden"
+	},
+	"login.totp-code": {
+		"defaultMessage": "Verifizierungscode"
+	},
+	"login.totp-code-placeholder": {
+		"defaultMessage": "Code eingeben"
+	},
+	"login.totp-description": {
+		"defaultMessage": "Gib den Code aus deiner Authenticator-App ein"
+	},
+	"login.totp-title": {
+		"defaultMessage": "MFA"
+	},
+	"login.totp-verify": {
+		"defaultMessage": "Verifizieren"
+	},
+	"mfa.backup-codes-remaining": {
+		"defaultMessage": "Verbleibende Backup-Codes: {count}"
+	},
+	"mfa.backup-warning": {
+		"defaultMessage": "Bewahre diese Backup-Codes an einem sicheren Ort auf. Jeder Code kann nur einmal verwendet werden."
+	},
+	"mfa.regenerate": {
+		"defaultMessage": "Neu generieren"
+	},
+	"mfa.regenerate-backup": {
+		"defaultMessage": "Backup-Codes neu generieren"
+	},
+	"mfa.regenerate-instructions": {
+		"defaultMessage": "Gib einen Verifizierungscode ein, um neue Backup-Codes zu generieren. Deine alten Codes werden dadurch ungültig."
+	},
+	"mfa.title": {
+		"defaultMessage": "MFA"
 	},
 	"nginx-config.label": {
 		"defaultMessage": "Benutzerdefinierte Nginx Konfiguration"
@@ -578,9 +524,6 @@
 	"options": {
 		"defaultMessage": "Optionen"
 	},
-	"or": {
-		"defaultMessage": "oder"
-	},
 	"password": {
 		"defaultMessage": "Passwort"
 	},
@@ -616,9 +559,6 @@
 	},
 	"proxy-host.forward-host": {
 		"defaultMessage": "Forward Hostname / IP"
-	},
-	"proxy-host.forward-host-path": {
-		"defaultMessage": "Forward Hostname / IP / Pfad"
 	},
 	"proxy-hosts": {
 		"defaultMessage": "Proxy Hosts"
@@ -690,7 +630,7 @@
 		"defaultMessage": "Willkommensseite"
 	},
 	"settings.default-site.description": {
-		"defaultMessage": "Was angezeigt wird, wenn nginx eine unbekannte Webseitenanfrage bekommt"
+		"defaultMessage": "Was angezeigt wird, wenn der Nginx eine unbekannte Webseitenanfrage bekommt"
 	},
 	"settings.default-site.html": {
 		"defaultMessage": "Benutzerdefinierte HTML"
@@ -709,9 +649,6 @@
 	},
 	"sign-in": {
 		"defaultMessage": "Anmelden"
-	},
-	"sign-in-with-oidc": {
-		"defaultMessage": "Anmelden mit OIDC"
 	},
 	"ssl-certificate": {
 		"defaultMessage": "TLS-Zertifikate"
@@ -743,6 +680,45 @@
 	"test": {
 		"defaultMessage": "Test"
 	},
+	"totp.disable": {
+		"defaultMessage": "TOTP deaktivieren"
+	},
+	"totp.disable-confirm": {
+		"defaultMessage": "TOTP deaktivieren"
+	},
+	"totp.disable-warning": {
+		"defaultMessage": "Das Deaktivieren von TOTP macht dein Konto weniger sicher."
+	},
+	"totp.disabled": {
+		"defaultMessage": "Deaktiviert"
+	},
+	"totp.done": {
+		"defaultMessage": "Ich habe meine Backup-Codes gespeichert"
+	},
+	"totp.enable": {
+		"defaultMessage": "TOTP aktivieren"
+	},
+	"totp.enabled": {
+		"defaultMessage": "Aktiviert"
+	},
+	"totp.enter-code": {
+		"defaultMessage": "Verifizierungscode eingeben"
+	},
+	"totp.enter-code-disable": {
+		"defaultMessage": "Verifizierungscode zum Deaktivieren eingeben"
+	},
+	"totp.secret-key": {
+		"defaultMessage": "Geheimer Schlüssel"
+	},
+	"totp.setup-instructions": {
+		"defaultMessage": "Scanne diesen QR-Code mit deiner Authenticator-App oder gib den geheimen Schlüssel manuell ein."
+	},
+	"totp.status": {
+		"defaultMessage": "Status"
+	},
+	"totp.verify-enable": {
+		"defaultMessage": "Verifizieren und aktivieren"
+	},
 	"update-available": {
 		"defaultMessage": "Update verfügbar: {latestVersion}"
 	},
@@ -770,6 +746,9 @@
 	"user.logout": {
 		"defaultMessage": "Ausloggen"
 	},
+	"user.mfa": {
+		"defaultMessage": "MFA"
+	},
 	"user.new-password": {
 		"defaultMessage": "Neues Password"
 	},
@@ -787,9 +766,6 @@
 	},
 	"user.switch-light": {
 		"defaultMessage": "Zum Light Mode wechseln"
-	},
-	"user.two-factor": {
-		"defaultMessage": "Zwei-Faktor-Auth"
 	},
 	"username": {
 		"defaultMessage": "Benutzername"

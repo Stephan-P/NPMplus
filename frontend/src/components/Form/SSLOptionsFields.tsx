@@ -122,7 +122,7 @@ export function SSLOptionsFields({
 									disabled={!hasCertificate || !sslForced}
 								/>
 								<span className="form-check-label">
-									<T id="domains.hsts-enabled" />
+									<T id="host.flags.hsts-enabled" />
 								</span>
 							</label>
 						)}
@@ -140,7 +140,7 @@ export function SSLOptionsFields({
 									disabled={!hasCertificate || !hstsEnabled}
 								/>
 								<span className="form-check-label">
-									<T id="domains.hsts-subdomains" />
+									<T id="host.flags.hsts-subdomains" />
 								</span>
 							</label>
 						)}

@@ -47,9 +47,6 @@
 	"action.clear": {
 		"defaultMessage": "Очистити"
 	},
-	"action.clone": {
-		"defaultMessage": "Клонувати"
-	},
 	"action.close": {
 		"defaultMessage": "Закрити"
 	},
