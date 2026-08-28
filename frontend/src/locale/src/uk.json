@@ -1,61 +1,4 @@
 {
-	"2fa.backup-codes-remaining": {
-		"defaultMessage": "Резервних кодів залишилося: {count}"
-	},
-	"2fa.backup-warning": {
-		"defaultMessage": "Збережіть ці резервні коди в безпечному місці. Кожен код можна використати лише один раз."
-	},
-	"2fa.disable": {
-		"defaultMessage": "Вимкнути двофакторну автентифікацію"
-	},
-	"2fa.disable-confirm": {
-		"defaultMessage": "Вимкнути 2FA"
-	},
-	"2fa.disable-warning": {
-		"defaultMessage": "Вимкнення двофакторної автентифікації знизить рівень безпеки вашого облікового запису."
-	},
-	"2fa.disabled": {
-		"defaultMessage": "Вимкнено"
-	},
-	"2fa.done": {
-		"defaultMessage": "Резервні коди збережено"
-	},
-	"2fa.enable": {
-		"defaultMessage": "Увімкнути двофакторну автентифікацію"
-	},
-	"2fa.enabled": {
-		"defaultMessage": "Увімкнено"
-	},
-	"2fa.enter-code": {
-		"defaultMessage": "Введіть код підтвердження"
-	},
-	"2fa.enter-code-disable": {
-		"defaultMessage": "Введіть код підтвердження для вимкнення"
-	},
-	"2fa.regenerate": {
-		"defaultMessage": "Згенерувати повторно"
-	},
-	"2fa.regenerate-backup": {
-		"defaultMessage": "Повторно згенерувати резервні коди"
-	},
-	"2fa.regenerate-instructions": {
-		"defaultMessage": "Введіть код підтвердження, щоб згенерувати нові резервні коди. Ваші старі коди стануть недійсними."
-	},
-	"2fa.secret-key": {
-		"defaultMessage": "Секретний ключ"
-	},
-	"2fa.setup-instructions": {
-		"defaultMessage": "Відскануйте цей QR-код у застосунку-автентифікаторі або введіть секретний ключ вручну."
-	},
-	"2fa.status": {
-		"defaultMessage": "Статус"
-	},
-	"2fa.title": {
-		"defaultMessage": "Двофакторна автентифікація"
-	},
-	"2fa.verify-enable": {
-		"defaultMessage": "Підтвердити й увімкнути"
-	},
 	"access-list": {
 		"defaultMessage": "Список доступу"
 	},
@@ -103,6 +46,9 @@
 	},
 	"action.clear": {
 		"defaultMessage": "Очистити"
+	},
+	"action.clone": {
+		"defaultMessage": "Клонувати"
 	},
 	"action.close": {
 		"defaultMessage": "Закрити"
@@ -207,22 +153,22 @@
 		"defaultMessage": "Цей розділ потребує знань про Certbot та його DNS-плагіни. Будь ласка, зверніться до документації відповідних плагінів."
 	},
 	"certificates.http.reachability-404": {
-		"defaultMessage": "На цьому домені знайдено сервер, але, схоже, це не Nginx Proxy Manager. Переконайтеся, що ваш домен вказує на IP-адресу, де запущено ваш екземпляр NPM."
+		"defaultMessage": "На цьому домені знайдено сервер, але, схоже, це не NPMplus. Переконайтеся, що ваш домен вказує на IP-адресу, де запущено ваш екземпляр NPMplus."
 	},
 	"certificates.http.reachability-failed-to-check": {
 		"defaultMessage": "Не вдалося перевірити доступність через помилку зв'язку з site24x7.com."
 	},
 	"certificates.http.reachability-not-resolved": {
-		"defaultMessage": "На цьому домені недоступний сервер. Переконайтеся, що домен існує та вказує на IP-адресу, де запущено ваш екземпляр NPM, і за потреби порт 80 проброшено на вашому роутері."
+		"defaultMessage": "На цьому домені недоступний сервер. Переконайтеся, що домен існує та вказує на IP-адресу, де запущено ваш екземпляр NPMplus, і за потреби порт 80 проброшено на вашому роутері."
 	},
 	"certificates.http.reachability-ok": {
 		"defaultMessage": "Сервер доступний, випуск сертифікатів можливий."
 	},
 	"certificates.http.reachability-other": {
-		"defaultMessage": "На цьому домені знайдено сервер, але він повернув неочікуваний статус-код {code}. Це сервер NPM? Переконайтеся, що ваш домен вказує на IP-адресу, де запущено ваш екземпляр NPM."
+		"defaultMessage": "На цьому домені знайдено сервер, але він повернув неочікуваний статус-код {code}. Це сервер NPMplus? Переконайтеся, що ваш домен вказує на IP-адресу, де запущено ваш екземпляр NPMplus."
 	},
 	"certificates.http.reachability-wrong-data": {
-		"defaultMessage": "На цьому домені знайдено сервер, але він повернув неочікувані дані. Це сервер NPM? Переконайтеся, що ваш домен вказує на IP-адресу, де запущено ваш екземпляр NPM."
+		"defaultMessage": "На цьому домені знайдено сервер, але він повернув неочікувані дані. Це сервер NPMplus? Переконайтеся, що ваш домен вказує на IP-адресу, де запущено ваш екземпляр NPMplus."
 	},
 	"certificates.http.test-results": {
 		"defaultMessage": "Результати перевірки"
@@ -243,7 +189,7 @@
 		"defaultMessage": "RSA 2048"
 	},
 	"certificates.request.subtitle": {
-		"defaultMessage": "через Let's Encrypt"
+		"defaultMessage": "через Certbot"
 	},
 	"certificates.request.title": {
 		"defaultMessage": "Отримати новий сертифікат"
@@ -312,7 +258,7 @@
 		"defaultMessage": "Джерело"
 	},
 	"column.ssl": {
-		"defaultMessage": "SSL"
+		"defaultMessage": "TLS"
 	},
 	"column.status": {
 		"defaultMessage": "Статус"
@@ -354,7 +300,7 @@
 		"defaultMessage": "Розширені налаштування"
 	},
 	"domains.force-ssl": {
-		"defaultMessage": "Завжди SSL"
+		"defaultMessage": "Завжди HTTPS"
 	},
 	"domains.hsts-enabled": {
 		"defaultMessage": "Підтримка HSTS"
@@ -453,13 +399,13 @@
 		"defaultMessage": "Тільки HTTP"
 	},
 	"lets-encrypt": {
-		"defaultMessage": "Let's Encrypt"
+		"defaultMessage": "Certbot"
 	},
 	"lets-encrypt-via-dns": {
-		"defaultMessage": "Let's Encrypt через DNS"
+		"defaultMessage": "Certbot через DNS"
 	},
 	"lets-encrypt-via-http": {
-		"defaultMessage": "Let's Encrypt через HTTP"
+		"defaultMessage": "Certbot через HTTP"
 	},
 	"loading": {
 		"defaultMessage": "Завантаження…"
@@ -470,23 +416,41 @@
 	"location.filter": {
 		"defaultMessage": "Фільтрувати за шляхом або призначенням"
 	},
-	"login.2fa-code": {
-		"defaultMessage": "Код підтвердження"
-	},
-	"login.2fa-code-placeholder": {
-		"defaultMessage": "Введіть код"
-	},
-	"login.2fa-description": {
-		"defaultMessage": "Введіть код із застосунку-автентифікатора"
-	},
-	"login.2fa-title": {
-		"defaultMessage": "Двофакторна автентифікація"
-	},
-	"login.2fa-verify": {
-		"defaultMessage": "Підтвердити"
-	},
 	"login.title": {
 		"defaultMessage": "Авторизація"
+	},
+	"login.totp-code": {
+		"defaultMessage": "Код підтвердження"
+	},
+	"login.totp-code-placeholder": {
+		"defaultMessage": "Введіть код"
+	},
+	"login.totp-description": {
+		"defaultMessage": "Введіть код із застосунку-автентифікатора"
+	},
+	"login.totp-title": {
+		"defaultMessage": "MFA"
+	},
+	"login.totp-verify": {
+		"defaultMessage": "Підтвердити"
+	},
+	"mfa.backup-codes-remaining": {
+		"defaultMessage": "Резервних кодів залишилося: {count}"
+	},
+	"mfa.backup-warning": {
+		"defaultMessage": "Збережіть ці резервні коди в безпечному місці. Кожен код можна використати лише один раз."
+	},
+	"mfa.regenerate": {
+		"defaultMessage": "Згенерувати повторно"
+	},
+	"mfa.regenerate-backup": {
+		"defaultMessage": "Повторно згенерувати резервні коди"
+	},
+	"mfa.regenerate-instructions": {
+		"defaultMessage": "Введіть код підтвердження, щоб згенерувати нові резервні коди. Ваші старі коди стануть недійсними."
+	},
+	"mfa.title": {
+		"defaultMessage": "MFA"
 	},
 	"nginx-config.label": {
 		"defaultMessage": "Власна Nginx-конфігурація"
@@ -699,7 +663,7 @@
 		"defaultMessage": "Увійти"
 	},
 	"ssl-certificate": {
-		"defaultMessage": "SSL-сертифікат"
+		"defaultMessage": "TLS-сертифікат"
 	},
 	"stream": {
 		"defaultMessage": "Потік"
@@ -728,6 +692,45 @@
 	"test": {
 		"defaultMessage": "Перевірити"
 	},
+	"totp.disable": {
+		"defaultMessage": "Вимкнути TOTP"
+	},
+	"totp.disable-confirm": {
+		"defaultMessage": "Вимкнути TOTP"
+	},
+	"totp.disable-warning": {
+		"defaultMessage": "Вимкнення TOTP знизить рівень безпеки вашого облікового запису."
+	},
+	"totp.disabled": {
+		"defaultMessage": "Вимкнено"
+	},
+	"totp.done": {
+		"defaultMessage": "Резервні коди збережено"
+	},
+	"totp.enable": {
+		"defaultMessage": "Увімкнути TOTP"
+	},
+	"totp.enabled": {
+		"defaultMessage": "Увімкнено"
+	},
+	"totp.enter-code": {
+		"defaultMessage": "Введіть код підтвердження"
+	},
+	"totp.enter-code-disable": {
+		"defaultMessage": "Введіть код підтвердження для вимкнення"
+	},
+	"totp.secret-key": {
+		"defaultMessage": "Секретний ключ"
+	},
+	"totp.setup-instructions": {
+		"defaultMessage": "Відскануйте цей QR-код у застосунку-автентифікаторі або введіть секретний ключ вручну."
+	},
+	"totp.status": {
+		"defaultMessage": "Статус"
+	},
+	"totp.verify-enable": {
+		"defaultMessage": "Підтвердити й увімкнути"
+	},
 	"update-available": {
 		"defaultMessage": "Доступне оновлення: {latestVersion}"
 	},
@@ -755,6 +758,9 @@
 	"user.logout": {
 		"defaultMessage": "Вийти"
 	},
+	"user.mfa": {
+		"defaultMessage": "MFA"
+	},
 	"user.new-password": {
 		"defaultMessage": "Новий пароль"
 	},
@@ -772,9 +778,6 @@
 	},
 	"user.switch-light": {
 		"defaultMessage": "Увімкнути світлу тему"
-	},
-	"user.two-factor": {
-		"defaultMessage": "Двофакторна автентифікація"
 	},
 	"username": {
 		"defaultMessage": "Ім'я користувача"

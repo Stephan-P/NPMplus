@@ -19,8 +19,8 @@ import langPl from "./lang/pl.json" with { type: "json" };
 import langPt from "./lang/pt.json" with { type: "json" };
 import langRu from "./lang/ru.json" with { type: "json" };
 import langSk from "./lang/sk.json" with { type: "json" };
-import langUk from "./lang/uk.json";
 import langTr from "./lang/tr.json" with { type: "json" };
+import langUk from "./lang/uk.json" with { type: "json" };
 import langVi from "./lang/vi.json" with { type: "json" };
 import langZh from "./lang/zh.json" with { type: "json" };
 
@@ -47,8 +47,8 @@ const localeOptions = [
 	["pt", "pt-PT", langPt],
 	["ru", "ru-RU", langRu],
 	["sk", "sk-SK", langSk],
-	["uk", "uk-UA", langUk],
 	["tr", "tr-TR", langTr],
+	["uk", "uk-UA", langUk],
 	["vi", "vi-VN", langVi],
 	["zh", "zh-CN", langZh],
 ];

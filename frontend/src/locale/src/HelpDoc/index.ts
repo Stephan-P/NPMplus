@@ -17,12 +17,12 @@ import * as pl from "./pl/index";
 import * as pt from "./pt/index";
 import * as ru from "./ru/index";
 import * as sk from "./sk/index";
-import * as uk from "./uk/index";
 import * as tr from "./tr/index";
+import * as uk from "./uk/index";
 import * as vi from "./vi/index";
 import * as zh from "./zh/index";
 
-const items: any = { en, bg, cs, de, es, et, fr, ga, hu, id, it, ja, ko, nl, no, pl, pt, ru, sk, uk, tr, vi, zh };
+const items: any = { en, bg, cs, de, es, et, fr, ga, hu, id, it, ja, ko, nl, no, pl, pt, ru, sk, tr, uk, vi, zh };
 
 const fallbackLang = "en";
 
