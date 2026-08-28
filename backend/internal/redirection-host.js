@@ -8,7 +8,7 @@ import internalCertificate from "./certificate.js";
 import internalHost from "./host.js";
 import internalNginx from "./nginx.js";
 
-const omissions = () => ["is_deleted"];
+const omissions = () => ["is_deleted", "owner.is_deleted", "certificate.is_deleted"];
 
 const internalRedirectionHost = {
 	/**
@@ -17,7 +17,7 @@ const internalRedirectionHost = {
 	 * @returns {Promise}
 	 */
 	create: async (access, data) => {
-		let thisData = data || {};
+		let thisData = data;
 		const createCertificate = thisData.certificate_id === "new";
 
 		if (createCertificate) {
@@ -27,28 +27,24 @@ const internalRedirectionHost = {
 		await access.can("redirection_hosts:create", thisData);
 
 		// Get a list of the domain names and check each of them against existing records
-
 		const checkResults = await Promise.all(
-			thisData.domain_names.map((domain_name) => internalHost.isHostnameTaken(domain_name)),
+			thisData.domain_names.map((domainName) => internalHost.isHostnameTaken(domainName)),
 		);
 		const taken = checkResults.find((result) => result.is_taken);
 		if (taken) {
 			throw new errs.ValidationError(`${taken.hostname} is already in use`);
 		}
+
 		// At this point the domains should have been checked
 		thisData.owner_user_id = access.token.getUserId(1);
 		thisData = internalHost.cleanSslHstsData(createCertificate, thisData);
 
-		// Fix for db field not having a default value
-		// for this optional field.
-		if (typeof data.advanced_config === "undefined") {
-			data.advanced_config = "";
-		}
-
 		const createdRow = utils.omitRow(omissions())(await redirectionHostModel.query().insertAndFetch(thisData));
+
 		if (createCertificate) {
 			const cert = await internalCertificate.createQuickCertificate(access, thisData);
 
+			// update host with cert id
 			await internalRedirectionHost.update(access, {
 				id: createdRow.id,
 				certificate_id: cert.id,
@@ -60,9 +56,11 @@ const internalRedirectionHost = {
 			expand: ["certificate", "owner"],
 		});
 
+		// Configure nginx
 		await internalNginx.configure(redirectionHostModel, "redirection_host", row);
-		thisData.meta = { ...thisData.meta, ...row.meta };
 
+		// Add to audit log
+		thisData.meta = { ...thisData.meta, ...row.meta };
 		await internalAuditLog.add(access, {
 			action: "created",
 			object_type: "redirection-host",
@@ -80,7 +78,7 @@ const internalRedirectionHost = {
 	 * @return {Promise}
 	 */
 	update: async (access, data) => {
-		let thisData = data || {};
+		let thisData = data;
 		const createCertificate = thisData.certificate_id === "new";
 
 		if (createCertificate) {
@@ -90,11 +88,10 @@ const internalRedirectionHost = {
 		await access.can("redirection_hosts:update", thisData.id);
 
 		// Get a list of the domain names and check each of them against existing records
-
 		if (typeof thisData.domain_names !== "undefined") {
 			const checkResults = await Promise.all(
-				thisData.domain_names.map((domain_name) =>
-					internalHost.isHostnameTaken(domain_name, "redirection", thisData.id),
+				thisData.domain_names.map((domainName) =>
+					internalHost.isHostnameTaken(domainName, "redirection", thisData.id),
 				),
 			);
 			const taken = checkResults.find((result) => result.is_taken);
@@ -102,6 +99,7 @@ const internalRedirectionHost = {
 				throw new errs.ValidationError(`${taken.hostname} is already in use`);
 			}
 		}
+
 		const existingRow = await internalRedirectionHost.get(access, { id: thisData.id });
 		if (existingRow.id !== thisData.id) {
 			// Sanity check that something crazy hasn't happened
@@ -119,13 +117,14 @@ const internalRedirectionHost = {
 			// update host with cert id
 			thisData.certificate_id = cert.id;
 		}
+
 		// Add domain_names to the data in case it isn't there, so that the audit log renders correctly. The order is important here.
 		thisData = { domain_names: existingRow.domain_names, ...thisData };
-
 		thisData = internalHost.cleanSslHstsData(createCertificate, thisData, existingRow);
 
 		await redirectionHostModel.query().where({ id: thisData.id }).patch(thisData);
 
+		// Add to audit log
 		await internalAuditLog.add(access, {
 			action: "updated",
 			object_type: "redirection-host",
@@ -135,12 +134,16 @@ const internalRedirectionHost = {
 
 		const row = await internalRedirectionHost.get(access, {
 			id: thisData.id,
-			expand: ["owner", "certificate"],
+			expand: ["certificate", "owner"],
 		});
 
-		const new_meta = await internalNginx.configure(redirectionHostModel, "redirection_host", row);
+		if (!row.enabled) {
+			// No need to add nginx config if host is disabled
+			return _.omit(internalHost.cleanRowCertificateMeta(row), omissions());
+		}
 
-		row.meta = new_meta;
+		// Configure nginx
+		row.meta = await internalNginx.configure(redirectionHostModel, "redirection_host", row);
 
 		return _.omit(internalHost.cleanRowCertificateMeta(row), omissions());
 	},
@@ -156,7 +159,7 @@ const internalRedirectionHost = {
 	get: async (access, data) => {
 		const thisData = data || {};
 
-		const access_data = await access.can("redirection_hosts:get", thisData.id);
+		const accessData = await access.can("redirection_hosts:get", thisData.id);
 
 		const query = redirectionHostModel
 			.query()
@@ -165,7 +168,7 @@ const internalRedirectionHost = {
 			.allowGraph(redirectionHostModel.defaultAllowGraph)
 			.first();
 
-		if (access_data.permission_visibility !== "all") {
+		if (accessData.permission_visibility !== "all") {
 			query.andWhere("owner_user_id", access.token.getUserId(1));
 		}
 
@@ -174,15 +177,17 @@ const internalRedirectionHost = {
 		}
 
 		const row = utils.omitRow(omissions())(await query);
-		let thisRow = row;
-		if (!thisRow?.id) {
+		if (!row?.id) {
 			throw new errs.ItemNotFoundError(thisData.id);
 		}
-		thisRow = internalHost.cleanRowCertificateMeta(thisRow);
+
+		const thisRow = internalHost.cleanRowCertificateMeta(row);
+
 		// Custom omissions
 		if (typeof thisData.omit !== "undefined" && thisData.omit !== null) {
 			return _.omit(thisRow, thisData.omit);
 		}
+
 		return thisRow;
 	},
 
@@ -205,9 +210,11 @@ const internalRedirectionHost = {
 			is_deleted: 1,
 		});
 
+		// Delete Nginx Config
 		await internalNginx.deleteConfig("redirection_host", row);
 		await internalNginx.reload();
 
+		// Add to audit log
 		await internalAuditLog.add(access, {
 			action: "deleted",
 			object_type: "redirection-host",
@@ -232,7 +239,6 @@ const internalRedirectionHost = {
 			id: data.id,
 			expand: ["certificate", "owner"],
 		});
-
 		if (!row?.id) {
 			throw new errs.ItemNotFoundError(data.id);
 		}
@@ -241,20 +247,23 @@ const internalRedirectionHost = {
 		}
 
 		const checkResults = await Promise.all(
-			row.domain_names.map((domain_name) => internalHost.isHostnameTaken(domain_name)),
+			row.domain_names.map((domainName) => internalHost.isHostnameTaken(domainName)),
 		);
 		const taken = checkResults.find((result) => result.is_taken);
 		if (taken) {
 			throw new errs.ValidationError(`${taken.hostname} is already in use by an active host`);
 		}
+
 		row.enabled = 1;
 
 		await redirectionHostModel.query().where("id", row.id).patch({
 			enabled: 1,
 		});
 
+		// Configure nginx
 		await internalNginx.configure(redirectionHostModel, "redirection_host", row);
 
+		// Add to audit log
 		await internalAuditLog.add(access, {
 			action: "enabled",
 			object_type: "redirection-host",
@@ -289,9 +298,11 @@ const internalRedirectionHost = {
 			enabled: 0,
 		});
 
+		// Delete Nginx Config
 		await internalNginx.deleteConfig("redirection_host", row);
 		await internalNginx.reload();
 
+		// Add to audit log
 		await internalAuditLog.add(access, {
 			action: "disabled",
 			object_type: "redirection-host",
@@ -307,11 +318,11 @@ const internalRedirectionHost = {
 	 *
 	 * @param   {Access}  access
 	 * @param   {Array}   [expand]
-	 * @param   {String}  [search_query]
+	 * @param   {String}  [searchQuery]
 	 * @returns {Promise}
 	 */
-	getAll: async (access, expand, search_query) => {
-		const access_data = await access.can("redirection_hosts:list");
+	getAll: async (access, expand, searchQuery) => {
+		const accessData = await access.can("redirection_hosts:list");
 
 		const query = redirectionHostModel
 			.query()
@@ -320,14 +331,14 @@ const internalRedirectionHost = {
 			.allowGraph(redirectionHostModel.defaultAllowGraph)
 			.orderBy(castJsonIfNeed("domain_names"), "ASC");
 
-		if (access_data.permission_visibility !== "all") {
+		if (accessData.permission_visibility !== "all") {
 			query.andWhere("owner_user_id", access.token.getUserId(1));
 		}
 
 		// Query is used for searching
-		if (typeof search_query === "string" && search_query.length > 0) {
+		if (typeof searchQuery === "string" && searchQuery.length > 0) {
 			query.where(function () {
-				this.where(castJsonIfNeed("domain_names"), "like", `%${search_query}%`);
+				this.where(castJsonIfNeed("domain_names"), "like", `%${searchQuery}%`);
 			});
 		}
 

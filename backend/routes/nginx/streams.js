@@ -121,7 +121,7 @@ router
 	/**
 	 * PUT /api/nginx/streams/123
 	 *
-	 * Update and existing stream
+	 * Update an existing stream
 	 */
 	.put(async (req, res, next) => {
 		try {
@@ -138,7 +138,7 @@ router
 	/**
 	 * DELETE /api/nginx/streams/123
 	 *
-	 * Update and existing stream
+	 * Delete a stream
 	 */
 	.delete(async (req, res, next) => {
 		try {
@@ -158,7 +158,7 @@ router
  * /api/nginx/streams/123/enable
  */
 router
-	.route("/:host_id/enable")
+	.route("/:stream_id/enable")
 	.options((_, res) => {
 		res.sendStatus(204);
 	})
@@ -170,7 +170,7 @@ router
 	.post(async (req, res, next) => {
 		try {
 			const result = await internalStream.enable(res.locals.access, {
-				id: Number.parseInt(req.params.host_id, 10),
+				id: Number.parseInt(req.params.stream_id, 10),
 			});
 			res.status(200).send(result);
 		} catch (err) {
@@ -185,7 +185,7 @@ router
  * /api/nginx/streams/123/disable
  */
 router
-	.route("/:host_id/disable")
+	.route("/:stream_id/disable")
 	.options((_, res) => {
 		res.sendStatus(204);
 	})
@@ -197,7 +197,7 @@ router
 	.post(async (req, res, next) => {
 		try {
 			const result = await internalStream.disable(res.locals.access, {
-				id: Number.parseInt(req.params.host_id, 10),
+				id: Number.parseInt(req.params.stream_id, 10),
 			});
 			res.status(200).send(result);
 		} catch (err) {

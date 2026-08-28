@@ -17,32 +17,23 @@ const internalStream = {
 	 * @returns {Promise}
 	 */
 	create: async (access, data) => {
-		const create_certificate = data.certificate_id === "new";
+		const thisData = data;
+		const createCertificate = thisData.certificate_id === "new";
 
-		if (create_certificate) {
-			delete data.certificate_id;
+		if (createCertificate) {
+			delete thisData.certificate_id;
 		}
 
-		await access.can("streams:create", data);
+		await access.can("streams:create", thisData);
 
-		// TODO: At this point the existing ports should have been checked
-		data.owner_user_id = access.token.getUserId(1);
+		thisData.owner_user_id = access.token.getUserId(1);
 
-		if (typeof data.meta === "undefined") {
-			data.meta = {};
-		}
-		if (typeof data.npmplus_advanced_config === "undefined") {
-			data.npmplus_advanced_config = "";
-		}
+		const createdRow = utils.omitRow(omissions())(await streamModel.query().insertAndFetch(thisData));
 
-		// streams aren't routed by domain name so don't store domain names in the DB
-		const data_no_domains = structuredClone(data);
-		delete data_no_domains.domain_names;
+		if (createCertificate) {
+			const cert = await internalCertificate.createQuickCertificate(access, thisData);
 
-		const createdRow = utils.omitRow(omissions())(await streamModel.query().insertAndFetch(data_no_domains));
-		if (create_certificate) {
-			const cert = await internalCertificate.createQuickCertificate(access, data);
-
+			// update host with cert id
 			await internalStream.update(access, {
 				id: createdRow.id,
 				certificate_id: cert.id,
@@ -54,13 +45,16 @@ const internalStream = {
 			expand: ["certificate", "owner"],
 		});
 
+		// Configure nginx
 		await internalNginx.configure(streamModel, "stream", row);
 
+		// Add to audit log
+		thisData.meta = { ...thisData.meta, ...row.meta };
 		await internalAuditLog.add(access, {
 			action: "created",
 			object_type: "stream",
 			object_id: row.id,
-			meta: data,
+			meta: thisData,
 		});
 
 		return row;
@@ -73,10 +67,10 @@ const internalStream = {
 	 * @return {Promise}
 	 */
 	update: async (access, data) => {
-		let thisData = data;
-		const create_certificate = thisData.certificate_id === "new";
+		const thisData = data;
+		const createCertificate = thisData.certificate_id === "new";
 
-		if (create_certificate) {
+		if (createCertificate) {
 			delete thisData.certificate_id;
 		}
 
@@ -90,7 +84,7 @@ const internalStream = {
 			);
 		}
 
-		if (create_certificate) {
+		if (createCertificate) {
 			const cert = await internalCertificate.createQuickCertificate(access, {
 				domain_names: thisData.domain_names || existingRow.domain_names,
 				meta: { ...existingRow.meta, ...thisData.meta },
@@ -99,11 +93,10 @@ const internalStream = {
 			// update host with cert id
 			thisData.certificate_id = cert.id;
 		}
-		// Add domain_names to the data in case it isn't there, so that the audit log renders correctly. The order is important here.
-		thisData = { domain_names: existingRow.domain_names, ...thisData };
 
-		await streamModel.query().patchAndFetchById(existingRow.id, thisData);
+		await streamModel.query().where({ id: thisData.id }).patch(thisData);
 
+		// Add to audit log
 		await internalAuditLog.add(access, {
 			action: "updated",
 			object_type: "stream",
@@ -111,9 +104,18 @@ const internalStream = {
 			meta: thisData,
 		});
 
-		const row = await internalStream.get(access, { id: thisData.id, expand: ["owner", "certificate"] });
-		const new_meta = await internalNginx.configure(streamModel, "stream", row);
-		row.meta = new_meta;
+		const row = await internalStream.get(access, {
+			id: thisData.id,
+			expand: ["certificate", "owner"],
+		});
+
+		if (!row.enabled) {
+			// No need to add nginx config if host is disabled
+			return _.omit(internalHost.cleanRowCertificateMeta(row), omissions());
+		}
+
+		// Configure nginx
+		row.meta = await internalNginx.configure(streamModel, "stream", row);
 
 		return _.omit(internalHost.cleanRowCertificateMeta(row), omissions());
 	},
@@ -129,7 +131,7 @@ const internalStream = {
 	get: async (access, data) => {
 		const thisData = data || {};
 
-		const access_data = await access.can("streams:get", thisData.id);
+		const accessData = await access.can("streams:get", thisData.id);
 
 		const query = streamModel
 			.query()
@@ -138,7 +140,7 @@ const internalStream = {
 			.allowGraph(streamModel.defaultAllowGraph)
 			.first();
 
-		if (access_data.permission_visibility !== "all") {
+		if (accessData.permission_visibility !== "all") {
 			query.andWhere("owner_user_id", access.token.getUserId(1));
 		}
 
@@ -147,15 +149,17 @@ const internalStream = {
 		}
 
 		const row = utils.omitRow(omissions())(await query);
-		let thisRow = row;
-		if (!thisRow?.id) {
+		if (!row?.id) {
 			throw new errs.ItemNotFoundError(thisData.id);
 		}
-		thisRow = internalHost.cleanRowCertificateMeta(thisRow);
+
+		const thisRow = internalHost.cleanRowCertificateMeta(row);
+
 		// Custom omissions
 		if (typeof thisData.omit !== "undefined" && thisData.omit !== null) {
 			return _.omit(thisRow, thisData.omit);
 		}
+
 		return thisRow;
 	},
 
@@ -178,9 +182,11 @@ const internalStream = {
 			is_deleted: 1,
 		});
 
+		// Delete Nginx Config
 		await internalNginx.deleteConfig("stream", row);
 		await internalNginx.reload();
 
+		// Add to audit log
 		await internalAuditLog.add(access, {
 			action: "deleted",
 			object_type: "stream",
@@ -205,7 +211,6 @@ const internalStream = {
 			id: data.id,
 			expand: ["certificate", "owner"],
 		});
-
 		if (!row?.id) {
 			throw new errs.ItemNotFoundError(data.id);
 		}
@@ -219,8 +224,10 @@ const internalStream = {
 			enabled: 1,
 		});
 
+		// Configure nginx
 		await internalNginx.configure(streamModel, "stream", row);
 
+		// Add to audit log
 		await internalAuditLog.add(access, {
 			action: "enabled",
 			object_type: "stream",
@@ -255,9 +262,11 @@ const internalStream = {
 			enabled: 0,
 		});
 
+		// Delete Nginx Config
 		await internalNginx.deleteConfig("stream", row);
 		await internalNginx.reload();
 
+		// Add to audit log
 		await internalAuditLog.add(access, {
 			action: "disabled",
 			object_type: "stream",
@@ -273,11 +282,11 @@ const internalStream = {
 	 *
 	 * @param   {Access}  access
 	 * @param   {Array}   [expand]
-	 * @param   {String}  [search_query]
+	 * @param   {String}  [searchQuery]
 	 * @returns {Promise}
 	 */
-	getAll: async (access, expand, search_query) => {
-		const access_data = await access.can("streams:list");
+	getAll: async (access, expand, searchQuery) => {
+		const accessData = await access.can("streams:list");
 
 		const query = streamModel
 			.query()
@@ -286,17 +295,17 @@ const internalStream = {
 			.allowGraph(streamModel.defaultAllowGraph)
 			.orderBy("incoming_port", "ASC");
 
-		if (access_data.permission_visibility !== "all") {
+		if (accessData.permission_visibility !== "all") {
 			query.andWhere("owner_user_id", access.token.getUserId(1));
 		}
 
 		// Query is used for searching
-		if (typeof search_query === "string" && search_query.length > 0) {
+		if (typeof searchQuery === "string" && searchQuery.length > 0) {
 			query.where(function () {
-				this.where(castJsonIfNeed("incoming_port"), "like", `%${search_query}%`)
-					.orWhere(castJsonIfNeed("forwarding_port"), "like", `%${search_query}%`)
-					.orWhere("forwarding_host", "like", `%${search_query}%`)
-					.orWhere("npmplus_description", "like", `%${search_query}%`);
+				this.where(castJsonIfNeed("incoming_port"), "like", `%${searchQuery}%`)
+					.orWhere(castJsonIfNeed("forwarding_port"), "like", `%${searchQuery}%`)
+					.orWhere("forwarding_host", "like", `%${searchQuery}%`)
+					.orWhere("npmplus_description", "like", `%${searchQuery}%`);
 			});
 		}
 
@@ -320,7 +329,7 @@ const internalStream = {
 	 * @returns {Promise}
 	 */
 	getCount: async (user_id, visibility) => {
-		const query = streamModel.query().count("id AS count").where("is_deleted", 0);
+		const query = streamModel.query().count("id as count").where("is_deleted", 0);
 
 		if (visibility !== "all") {
 			query.andWhere("owner_user_id", user_id);

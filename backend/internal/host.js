@@ -19,24 +19,12 @@ const checkHostnameRecordsTaken = (hostname, existingRows, ignoreId) =>
 			),
 	);
 
-/**
- * @param   {Array}   hosts
- * @param   {Array}   domainNames
- * @returns {Array}
- */
-const getHostsWithDomains = (hosts, domainNames) => {
-	const wanted = new Set(domainNames.map((domainName) => domainName.toLowerCase()));
-
-	return (hosts || []).filter((host) =>
-		host.domain_names.some((hostDomainName) => wanted.has(hostDomainName.toLowerCase())),
-	);
-};
-
 const internalHost = {
 	/**
 	 * Makes sure that the ssl_* and hsts_* fields play nicely together.
 	 * ie: if there is no cert, then force_ssl is off.
 	 *     if force_ssl is off, then hsts_enabled is definitely off.
+	 *     if hsts_enabled is off, then hsts_subdomains is definitely off.
 	 *
 	 * @param   {object} data
 	 * @param   {object} [existing_data]
@@ -46,12 +34,15 @@ const internalHost = {
 		const combinedData = { ...existingData, ...data };
 
 		if (!combinedData.certificate_id && !newCert) {
-			combinedData.hsts_subdomains = false;
 			combinedData.ssl_forced = false;
 		}
 
 		if (!combinedData.ssl_forced) {
 			combinedData.hsts_enabled = false;
+		}
+
+		if (!combinedData.hsts_enabled) {
+			combinedData.hsts_subdomains = false;
 		}
 
 		return combinedData;
@@ -85,36 +76,6 @@ const internalHost = {
 		}
 
 		return row;
-	},
-
-	/**
-	 * This returns all the host types with any domain listed in the provided domainNames array.
-	 * This is used by the certificates to temporarily disable any host that is using the domain
-	 *
-	 * @param   {Array}  domainNames
-	 * @returns {Promise}
-	 */
-	getHostsWithDomains: async (domainNames) => {
-		const responseObject = {
-			total_count: 0,
-			dead_hosts: [],
-			proxy_hosts: [],
-			redirection_hosts: [],
-		};
-
-		const proxyRes = await proxyHostModel.query().where("is_deleted", 0);
-		responseObject.proxy_hosts = getHostsWithDomains(proxyRes, domainNames);
-		responseObject.total_count += responseObject.proxy_hosts.length;
-
-		const redirRes = await redirectionHostModel.query().where("is_deleted", 0);
-		responseObject.redirection_hosts = getHostsWithDomains(redirRes, domainNames);
-		responseObject.total_count += responseObject.redirection_hosts.length;
-
-		const deadRes = await deadHostModel.query().where("is_deleted", 0);
-		responseObject.dead_hosts = getHostsWithDomains(deadRes, domainNames);
-		responseObject.total_count += responseObject.dead_hosts.length;
-
-		return responseObject;
 	},
 
 	/**

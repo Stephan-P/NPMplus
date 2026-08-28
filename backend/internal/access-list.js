@@ -12,7 +12,7 @@ import internalAuditLog from "./audit-log.js";
 import internalNginx from "./nginx.js";
 import internalProxyHostAccessList from "./proxy-host-access-list.js";
 
-const omissions = () => ["is_deleted"];
+const omissions = () => ["is_deleted", "owner.is_deleted"];
 
 const internalAccessList = {
 	/**
@@ -446,7 +446,7 @@ const internalAccessList = {
 		if (!list) {
 			return list;
 		}
-		return { ...list, items: list.items?.map((item) => ({ ...item, password: "" })) };
+		return { ..._.omit(list, omissions()), items: list.items?.map((item) => ({ ...item, password: "" })) };
 	},
 
 	/**

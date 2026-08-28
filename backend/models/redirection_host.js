@@ -3,7 +3,7 @@
 
 import { Model } from "objection";
 import db from "../db.js";
-import { castJsonIfNeed, convertBoolFieldsToInt, convertIntFieldsToBool } from "../lib/helpers.js";
+import { convertBoolFieldsToInt, convertIntFieldsToBool } from "../lib/helpers.js";
 import Certificate from "./certificate.js";
 import now from "./now_helper.js";
 import User from "./user.js";
@@ -66,14 +66,6 @@ class RedirectionHost extends Model {
 
 	static get defaultAllowGraph() {
 		return "[owner,certificate]";
-	}
-
-	static get defaultExpand() {
-		return ["certificate", "owner"];
-	}
-
-	static get defaultOrder() {
-		return [castJsonIfNeed("domain_names"), "ASC"];
 	}
 
 	static get relationMappings() {

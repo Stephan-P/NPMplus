@@ -125,7 +125,7 @@ router
 	/**
 	 * PUT /api/nginx/proxy-hosts/123
 	 *
-	 * Update and existing proxy-host
+	 * Update an existing proxy-host
 	 */
 	.put(async (req, res, next) => {
 		try {
@@ -142,7 +142,7 @@ router
 	/**
 	 * DELETE /api/nginx/proxy-hosts/123
 	 *
-	 * Update and existing proxy-host
+	 * Delete a proxy-host
 	 */
 	.delete(async (req, res, next) => {
 		try {

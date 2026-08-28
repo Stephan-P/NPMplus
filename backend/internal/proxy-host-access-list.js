@@ -1,4 +1,5 @@
 import { readdir, rm } from "node:fs/promises";
+import _ from "lodash";
 import errs from "../lib/error.js";
 import { access as logger } from "../logger.js";
 import accessListModel from "../models/access_list.js";
@@ -6,6 +7,8 @@ import internalAccessList from "./access-list.js";
 import internalNginx from "./nginx.js";
 
 const GENERATED_DIR = "/data/access";
+
+const omissions = () => ["is_deleted", "owner.is_deleted", "certificate.is_deleted"];
 
 const getMergedItems = (accessLists) => {
 	const seen = new Set();
@@ -304,7 +307,7 @@ const internalProxyHostAccessList = {
 		}
 
 		return {
-			...proxyHost,
+			..._.omit(proxyHost, omissions()),
 			access_lists: proxyHost.access_lists?.map((accessList) => internalAccessList.maskItems(accessList)),
 			locations: proxyHost.locations?.map((location) => ({
 				...location,

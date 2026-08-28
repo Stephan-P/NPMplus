@@ -3,7 +3,7 @@
 
 import { Model } from "objection";
 import db from "../db.js";
-import { castJsonIfNeed, convertBoolFieldsToInt, convertIntFieldsToBool } from "../lib/helpers.js";
+import { convertBoolFieldsToInt, convertIntFieldsToBool } from "../lib/helpers.js";
 import AccessList from "./access_list.js";
 import Certificate from "./certificate.js";
 import now from "./now_helper.js";
@@ -67,7 +67,7 @@ class ProxyHost extends Model {
 	}
 
 	$formatDatabaseJson(json) {
-		const thisJson = convertBoolFieldsToInt({ ...json }, boolFields);
+		const thisJson = convertBoolFieldsToInt(json, boolFields);
 		return super.$formatDatabaseJson(thisJson);
 	}
 
@@ -85,14 +85,6 @@ class ProxyHost extends Model {
 
 	static get defaultAllowGraph() {
 		return "[owner,access_lists.[clients,items],certificate]";
-	}
-
-	static get defaultExpand() {
-		return ["owner", "certificate", "access_lists.[clients,items]"];
-	}
-
-	static get defaultOrder() {
-		return [castJsonIfNeed("domain_names"), "ASC"];
 	}
 
 	static get relationMappings() {

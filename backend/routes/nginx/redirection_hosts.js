@@ -121,7 +121,7 @@ router
 	/**
 	 * PUT /api/nginx/redirection-hosts/123
 	 *
-	 * Update and existing redirection-host
+	 * Update an existing redirection-host
 	 */
 	.put(async (req, res, next) => {
 		try {
@@ -138,7 +138,7 @@ router
 	/**
 	 * DELETE /api/nginx/redirection-hosts/123
 	 *
-	 * Update and existing redirection-host
+	 * Delete a redirection-host
 	 */
 	.delete(async (req, res, next) => {
 		try {

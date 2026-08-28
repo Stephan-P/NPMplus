@@ -16,7 +16,6 @@ export default function TableWrapper() {
 	const queryClient = useQueryClient();
 	const [search, setSearch] = useState("");
 	const [sorting, setSorting] = useState<SortingState>([]);
-	const [_deleteId, _setDeleteIdd] = useState(0);
 	const { isFetching, isLoading, isError, error, data } = useStreams(["owner", "certificate"]);
 
 	useEffect(() => {

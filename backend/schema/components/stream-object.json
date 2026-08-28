@@ -15,6 +15,8 @@
 		"npmplus_proxy_tls",
 		"enabled",
 		"npmplus_advanced_config",
+		"npmplus_description",
+		"certificate_id",
 		"meta"
 	],
 	"additionalProperties": false,
@@ -69,7 +71,10 @@
 			"$ref": "../common.json#/properties/enabled"
 		},
 		"certificate_id": {
-			"$ref": "../common.json#/properties/certificate_id"
+			"description": "Certificate ID",
+			"type": "integer",
+			"minimum": 0,
+			"example": 5
 		},
 		"npmplus_advanced_config": {
 			"type": "string",

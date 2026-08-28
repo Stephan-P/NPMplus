@@ -37,6 +37,7 @@
 		"npmplus_auth_request",
 		"npmplus_auth_request_upstream"
 	],
+	"additionalProperties": false,
 	"properties": {
 		"id": {
 			"$ref": "../common.json#/properties/id"

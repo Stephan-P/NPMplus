@@ -9,7 +9,7 @@ import internalHost from "./host.js";
 import internalNginx from "./nginx.js";
 import internalProxyHostAccessList from "./proxy-host-access-list.js";
 
-const omissions = () => ["is_deleted", "owner.is_deleted"];
+const omissions = () => ["is_deleted", "owner.is_deleted", "certificate.is_deleted"];
 
 const internalProxyHost = {
 	/**
@@ -24,51 +24,41 @@ const internalProxyHost = {
 		if (createCertificate) {
 			delete thisData.certificate_id;
 		}
-		data.npmplus_access_list_ids = data.npmplus_access_list_ids || [];
-		data.npmplus_access_list_type = data.npmplus_access_list_type || "public";
+
 		await access.can("proxy_hosts:create", thisData);
 
 		// Get a list of the domain names and check each of them against existing records
-
 		const checkResults = await Promise.all(
-			thisData.domain_names.map((domain_name) => internalHost.isHostnameTaken(domain_name)),
+			thisData.domain_names.map((domainName) => internalHost.isHostnameTaken(domainName)),
 		);
 		const taken = checkResults.find((result) => result.is_taken);
 		if (taken) {
 			throw new errs.ValidationError(`${taken.hostname} is already in use`);
 		}
+
 		// At this point the domains should have been checked
 		thisData.owner_user_id = access.token.getUserId(1);
 		thisData = internalHost.cleanSslHstsData(createCertificate, thisData);
-
-		// Fix for db field not having a default value
-		// for this optional field.
-		if (typeof thisData.advanced_config === "undefined") {
-			thisData.advanced_config = "";
-		}
-
-		if (typeof thisData.npmplus_location_config === "undefined") {
-			thisData.npmplus_location_config = "";
-		}
 		thisData = internalProxyHostAccessList.cleanAccessListTypes(thisData);
 		await internalProxyHostAccessList.validateAccessLists(thisData);
 
 		const createdRow = utils.omitRow(omissions())(
 			await proxyHostModel.transaction(async (trx) => {
-				const row = await proxyHostModel.query(trx).insertAndFetch(thisData);
+				const insertedRow = await proxyHostModel.query(trx).insertAndFetch(thisData);
 
-				const relationRows = internalProxyHostAccessList.getAccessListRelationRows(row.id, thisData);
+				const relationRows = internalProxyHostAccessList.getAccessListRelationRows(insertedRow.id, thisData);
 				if (relationRows.length > 0) {
 					await trx("npmplus_proxy_host_access_list").insert(relationRows);
 				}
 
-				return row;
+				return insertedRow;
 			}),
 		);
 
 		if (createCertificate) {
 			const cert = await internalCertificate.createQuickCertificate(access, thisData);
 
+			// update host with cert id
 			await internalProxyHost.update(access, {
 				id: createdRow.id,
 				certificate_id: cert.id,
@@ -83,10 +73,12 @@ const internalProxyHost = {
 		const row = await internalProxyHostAccessList.populateLocationAccessLists(
 			internalProxyHostAccessList.cleanAccessListTypes(fetchedRow),
 		);
-		await internalNginx.configure(proxyHostModel, "proxy_host", row);
-		// Audit log
-		thisData.meta = { ...thisData.meta, ...row.meta };
 
+		// Configure nginx
+		await internalNginx.configure(proxyHostModel, "proxy_host", row);
+
+		// Add to audit log
+		thisData.meta = { ...thisData.meta, ...row.meta };
 		await internalAuditLog.add(access, {
 			action: "created",
 			object_type: "proxy-host",
@@ -114,11 +106,10 @@ const internalProxyHost = {
 		await access.can("proxy_hosts:update", thisData.id);
 
 		// Get a list of the domain names and check each of them against existing records
-
 		if (typeof thisData.domain_names !== "undefined") {
 			const checkResults = await Promise.all(
-				thisData.domain_names.map((domain_name) =>
-					internalHost.isHostnameTaken(domain_name, "proxy", thisData.id),
+				thisData.domain_names.map((domainName) =>
+					internalHost.isHostnameTaken(domainName, "proxy", thisData.id),
 				),
 			);
 			const taken = checkResults.find((result) => result.is_taken);
@@ -126,6 +117,7 @@ const internalProxyHost = {
 				throw new errs.ValidationError(`${taken.hostname} is already in use`);
 			}
 		}
+
 		const existingRow = await internalProxyHost.get(access, { id: thisData.id });
 		if (existingRow.id !== thisData.id) {
 			// Sanity check that something crazy hasn't happened
@@ -143,9 +135,9 @@ const internalProxyHost = {
 			// update host with cert id
 			thisData.certificate_id = cert.id;
 		}
-		// Add domain_names to the data in case it isn't there, so that the audit log renders correctly. The order is important here.
-		thisData = { domain_names: existingRow.domain_names, ...data };
 
+		// Add domain_names to the data in case it isn't there, so that the audit log renders correctly. The order is important here.
+		thisData = { domain_names: existingRow.domain_names, ...thisData };
 		thisData = internalHost.cleanSslHstsData(createCertificate, thisData, existingRow);
 		thisData = internalProxyHostAccessList.cleanAccessListTypes(thisData);
 		await internalProxyHostAccessList.validateAccessLists(thisData);
@@ -158,6 +150,7 @@ const internalProxyHost = {
 			return patchResult;
 		});
 
+		// Add to audit log
 		await internalAuditLog.add(access, {
 			action: "updated",
 			object_type: "proxy-host",
@@ -167,21 +160,26 @@ const internalProxyHost = {
 
 		const fetchedRow = await internalProxyHost.get(access, {
 			id: thisData.id,
-			expand: ["owner", "certificate", "access_lists.[clients,items]"],
+			expand: ["certificate", "owner", "access_lists.[clients,items]"],
 		});
 
 		const row = await internalProxyHostAccessList.populateLocationAccessLists(
 			internalProxyHostAccessList.cleanAccessListTypes(fetchedRow),
 		);
+
 		if (!row.enabled) {
 			// No need to add nginx config if host is disabled
-			return internalProxyHostAccessList.maskAccessListItems(row);
+			return internalProxyHostAccessList.maskAccessListItems(
+				_.omit(internalHost.cleanRowCertificateMeta(row), omissions()),
+			);
 		}
-		const new_meta = await internalNginx.configure(proxyHostModel, "proxy_host", row);
-		row.meta = new_meta;
-		const cleanedRow = _.omit(internalHost.cleanRowCertificateMeta(row), omissions());
+
 		// Configure nginx
-		return internalProxyHostAccessList.maskAccessListItems(cleanedRow);
+		row.meta = await internalNginx.configure(proxyHostModel, "proxy_host", row);
+
+		return internalProxyHostAccessList.maskAccessListItems(
+			_.omit(internalHost.cleanRowCertificateMeta(row), omissions()),
+		);
 	},
 
 	/**
@@ -195,7 +193,7 @@ const internalProxyHost = {
 	get: async (access, data) => {
 		const thisData = data || {};
 
-		const access_data = await access.can("proxy_hosts:get", thisData.id);
+		const accessData = await access.can("proxy_hosts:get", thisData.id);
 
 		const query = proxyHostModel
 			.query()
@@ -204,7 +202,7 @@ const internalProxyHost = {
 			.allowGraph(proxyHostModel.defaultAllowGraph)
 			.first();
 
-		if (access_data.permission_visibility !== "all") {
+		if (accessData.permission_visibility !== "all") {
 			query.andWhere("owner_user_id", access.token.getUserId(1));
 		}
 
@@ -217,9 +215,8 @@ const internalProxyHost = {
 			throw new errs.ItemNotFoundError(thisData.id);
 		}
 
-		const aclRow = internalProxyHostAccessList.cleanAccessListTypes(row);
+		const thisRow = internalHost.cleanRowCertificateMeta(internalProxyHostAccessList.cleanAccessListTypes(row));
 
-		const thisRow = internalHost.cleanRowCertificateMeta(aclRow);
 		// Custom omissions
 		if (typeof thisData.omit !== "undefined" && thisData.omit !== null) {
 			return _.omit(thisRow, thisData.omit);
@@ -249,11 +246,13 @@ const internalProxyHost = {
 			}),
 		);
 
+		// Delete Nginx Config
 		await internalNginx.deleteConfig("proxy_host", row);
 
 		await internalProxyHostAccessList.delete(row);
 		await internalNginx.reload();
 
+		// Add to audit log
 		await internalAuditLog.add(access, {
 			action: "deleted",
 			object_type: "proxy-host",
@@ -278,7 +277,6 @@ const internalProxyHost = {
 			id: data.id,
 			expand: ["certificate", "owner", "access_lists.[clients,items]"],
 		});
-
 		if (!row?.id) {
 			throw new errs.ItemNotFoundError(data.id);
 		}
@@ -287,18 +285,20 @@ const internalProxyHost = {
 		}
 
 		const checkResults = await Promise.all(
-			row.domain_names.map((domain_name) => internalHost.isHostnameTaken(domain_name)),
+			row.domain_names.map((domainName) => internalHost.isHostnameTaken(domainName)),
 		);
 		const taken = checkResults.find((result) => result.is_taken);
 		if (taken) {
 			throw new errs.ValidationError(`${taken.hostname} is already in use by an active host`);
 		}
+
 		row.enabled = 1;
 
 		await proxyHostModel.query().where("id", row.id).patch({
 			enabled: 1,
 		});
 
+		// Configure nginx
 		await internalNginx.configure(
 			proxyHostModel,
 			"proxy_host",
@@ -307,6 +307,7 @@ const internalProxyHost = {
 			),
 		);
 
+		// Add to audit log
 		await internalAuditLog.add(access, {
 			action: "enabled",
 			object_type: "proxy-host",
@@ -341,9 +342,11 @@ const internalProxyHost = {
 			enabled: 0,
 		});
 
+		// Delete Nginx Config
 		await internalNginx.deleteConfig("proxy_host", row);
 		await internalNginx.reload();
 
+		// Add to audit log
 		await internalAuditLog.add(access, {
 			action: "disabled",
 			object_type: "proxy-host",
@@ -359,7 +362,7 @@ const internalProxyHost = {
 	 *
 	 * @param   {Access}  access
 	 * @param   {Array}   [expand]
-	 * @param   {String}  [search_query]
+	 * @param   {String}  [searchQuery]
 	 * @returns {Promise}
 	 */
 	getAll: async (access, expand, searchQuery) => {
@@ -387,13 +390,14 @@ const internalProxyHost = {
 			query.withGraphFetched(`[${expand.join(", ")}]`);
 		}
 
-		const rows = utils.omitRows(omissions())(await query);
-		const aclRows = rows.map((row) => internalProxyHostAccessList.cleanAccessListTypes(row));
-
+		const rows = utils
+			.omitRows(omissions())(await query)
+			.map((row) => internalProxyHostAccessList.cleanAccessListTypes(row));
 		if (typeof expand !== "undefined" && expand !== null && expand.indexOf("certificate") !== -1) {
-			return internalHost.cleanAllRowsCertificateMeta(aclRows);
+			return internalHost.cleanAllRowsCertificateMeta(rows);
 		}
-		return aclRows;
+
+		return rows;
 	},
 
 	/**

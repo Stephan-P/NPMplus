@@ -115,9 +115,6 @@
 						"npmplus_location_config": {
 							"$ref": "../../../../components/proxy-host-object.json#/properties/npmplus_location_config"
 						},
-						"enabled": {
-							"$ref": "../../../../components/proxy-host-object.json#/properties/enabled"
-						},
 						"meta": {
 							"$ref": "../../../../components/proxy-host-object.json#/properties/meta"
 						},

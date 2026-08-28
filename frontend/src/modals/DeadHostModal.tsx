@@ -159,7 +159,7 @@ const DeadHostModal = EasyModal.create(({ id, visible, remove }: Props) => {
 													role="tab"
 												>
 													<T id="domains.advanced" />
-													{values?.advancedConfig?.trim() ? "" : ""}
+													{values?.advancedConfig?.trim() ? "*" : ""}
 												</a>
 											</li>
 										</ul>
